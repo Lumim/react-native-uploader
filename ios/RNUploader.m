@@ -153,7 +153,10 @@ RCT_EXPORT_METHOD(upload:(NSDictionary *)obj callback:(RCTResponseSenderBlock)ca
                     CGImageRef fullScreenImageRef = [rep fullScreenImage];
                     UIImage *image = [UIImage imageWithCGImage:fullScreenImageRef];
 
-                    _file[@"data"] = UIImagePNGRepresentation(image);
+                    NSData *jpgImageData = UIImageJPEGRepresentation(image, 0.7);
+                    UIImage *imageObj = [UIImage imageWithData:jpgImageData];
+
+                   _file[@"data"] = UIImagePNGRepresentation(imageObj);
                 }
 
                 dispatch_group_leave(self.fgroup);
@@ -186,6 +189,9 @@ RCT_EXPORT_METHOD(upload:(NSDictionary *)obj callback:(RCTResponseSenderBlock)ca
         NSString *filename = file[@"filename"];
         NSString *filetype = file[@"filetype"];
         NSData *data       = file[@"data"];
+
+        filename = [filename stringByReplacingOccurrencesOfString:@".HEIC"
+                                             withString:@".JPG"];
 
         [self.requestBody appendData:self.formBoundaryData];
         [self.requestBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", name.length ? name : filename, filename] dataUsingEncoding:NSUTF8StringEncoding]];
